@@ -1,0 +1,22 @@
+# Credentials and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+**/secrets/
+**/credentials/
+
+# Local development files
+.venv/
+__pycache__/
+*.pyc
+.vscode/
+.idea/
