@@ -25,9 +25,9 @@ Windows VM                  Linux VM                 Azure platform
   Event Logs                 Syslog                  Activity/resource logs
       |                         |                             |
       v                         v                             |
- Azure Monitor Agent      Azure Monitor Agent                   |
+ Azure Monitor Agent      Azure Monitor Agent                 |
       |                         |                             |
- Windows DCR                Linux DCR                           |
+ Windows DCR                Linux DCR                         |
       |                         |                             |
       +------------+------------+                             |
                    |                                          |
