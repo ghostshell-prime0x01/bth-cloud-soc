@@ -3,14 +3,14 @@
 > \*\*Project:\*\* BTH Cloud SOC  
 > \*\*Owner:\*\* Ghost Shell Prime  
 > \*\*Scope:\*\* Historical Azure V1 implementation  
-> \*\*Status:\*\* Evidence catalog in progress  
-> \*\*Last updated:\*\* 2026-11-17
+> \*\*Status:\*\* Four historical screenshot artifacts reviewed; additional validation deferred to V2  
+> \*\*Last updated:\*\* 2026-11-21
 
 ## Purpose
 
 I built BTH Cloud SOC to demonstrate practical cloud security engineering—not just an architecture diagram. This register connects the capabilities I implemented and tested in Azure V1 to the artifacts that support those claims. It also makes clear what a screenshot proves, what it does not prove, and what I must validate again when I rebuild the environment in V2.
 
-My original V1 Azure environment is no longer active. Entries marked **Historical — pending artifact review** describe previous testing and point to preserved screenshots; they are **not** claims of current operational coverage. I will not mark evidence **Reviewed** until I have inspected the actual artifact and recorded its visible results.
+My original V1 Azure environment is no longer active. The four preserved screenshots have now been reviewed individually. **Reviewed** means the artifact was inspected and its visible content recorded; it does not mean the underlying detection pipeline or the current environment has been independently revalidated. Historical V1 observations are not claims of current operational coverage.
 
 ## Evidence handling standard
 
@@ -25,47 +25,83 @@ My original V1 Azure environment is no longer active. Entries marked **Historica
 
 ## Evidence index
 
-|ID|Capability|Artifact|Review state|Deployment state|
+|ID|Capability directly supported|Artifact|Review state|Deployment state|
 |-|-|-|-|-|
-|BTH-V1-EV-001|GeoIP watchlist access via KQL|[GeoIP query screenshot](../../evidence/v1/threat-hunting/geoip-watchlist-query.png)|Pending artifact review|Historical V1|
-|BTH-V1-EV-002|Network-flow investigation|[Malicious inbound flow screenshot](../../evidence/v1/network/malicious-inbound-flows.png)|Pending artifact review|Historical V1|
+|BTH-V1-EV-001|GeoIP watchlist query and returned records|[GeoIP query screenshot](../../evidence/v1/threat-hunting/geoip-watchlist-query.png)|Reviewed|Historical V1|
+|BTH-V1-EV-002|Sentinel network-oriented geographic workbook visualization|[Network workbook screenshot](../../evidence/v1/network/malicious-inbound-flows.png)|Reviewed|Historical V1|
+|BTH-V1-EV-003|Sentinel Windows RDP-oriented geographic workbook visualization|[Windows workbook screenshot](../../evidence/v1/dashboards/windows-security-monitoring.png)|Reviewed|Historical V1|
+|BTH-V1-EV-004|Sentinel Linux SSH-oriented geographic workbook visualization|[Linux workbook screenshot](../../evidence/v1/dashboards/linux-security-monitoring.png)|Reviewed|Historical V1|
+
+**Artifact path note:** Paths reflect the intended repository locations reported during evidence organization. Verify filename case and committed GitHub links after publication.
 
 ## BTH-V1-EV-001 — GeoIP watchlist query
 
-**Capability:** Threat intelligence enrichment / watchlist querying  
+**Capability:** Watchlist retrieval through KQL; historical threat-hunting support  
 **Evidence:** [`evidence/v1/threat-hunting/geoip-watchlist-query.png`](../../evidence/v1/threat-hunting/geoip-watchlist-query.png)  
-**Source:** Microsoft Sentinel / Log Analytics watchlist  
-**Historical validation method:** Execute the following KQL query:
+**Source:** Azure Log Analytics workspace `LAW-Cyber-Lab-0x`  
+**Query visible in screenshot:**
 
 ```kql
 \_GetWatchlist("geoip")
 ```
 
-**Reported historical result:** The GeoIP watchlist returned queryable results in V1. The screenshot is preserved for review; the exact returned fields, row count, and timestamp have not yet been transcribed from the artifact.
+**Observed result:** The Results pane contains populated watchlist rows, with visible columns including `SearchKey`, `cityname`, `countryname`, `\_DTItemId`, and a last-updated UTC field. Seven rows are visible, with a display indicator of `1 - 7 of 1000`; the latter is not proof of total watchlist size. Example country values include Iran, Russia, Netherlands, Italy, Poland, and France. The interface shows an execution duration of approximately 0.913 seconds. The displayed record-update timestamp is April 10, 2025; this is **not** a verified screenshot capture or query execution date.
 
-**What this can establish after review:** The watchlist was accessible from the query context at the time captured, provided the screenshot shows successful execution and returned records.
+**What this validates:** The `geoip` watchlist was accessible and returned structured records in the historical workspace.
 
-**What it does not establish:** That the watchlist was updated automatically, that every entry was accurate, that analytics rules consumed it, or that enrichment triggered incidents.
+**Limitations:** The screenshot does not prove that the records were malicious, that the watchlist was refreshed automatically, that an analytics rule used it, or that any incident was generated.
 
-**Review state:** Pending artifact review.  
-**V2 revalidation:** Redeploy or import the watchlist; confirm schema and contents; execute the query; capture dated results; separately test any detection rules that reference the watchlist.
+**Review state:** Reviewed — watchlist retrieval validated at screenshot level.  
+**V2 revalidation:** Import or deploy the watchlist, capture the query and schema with an explicit UTC test timestamp, validate its provenance and refresh process, and separately test rules that join against it.
 
-## BTH-V1-EV-002 — Malicious inbound network-flow analysis
+## BTH-V1-EV-002 — Network-oriented geographic workbook
 
-**Capability:** Network visibility / investigation  
+**Capability:** Sentinel Workbook visualization for network-security investigation  
 **Evidence:** [`evidence/v1/network/malicious-inbound-flows.png`](../../evidence/v1/network/malicious-inbound-flows.png)  
-**Source:** Azure Network Watcher flow-log analytics; `AzureNetworkAnalytics\_CL` was used in V1 investigations.
+**Source:** Microsoft Sentinel > Workbooks; workbook title `nsg-malicious-allowed-in`, workspace `law-cyber-lab-0x`.
 
-**Reported historical result:** Network-flow records were investigated for malicious inbound activity, including allowed/denied flow classifications where available. The exact filter, time range, and result count must be confirmed from the screenshot or associated query text.
+**Observed result:** A rendered world map displays geographic markers of varying sizes and colors, together with location summary values. Visible examples include Nancy (France) 537, Other 205, Irwin (United States) 192, Boonton (United States) 161, and Lorinci (Hungary) 106. The screenshot does not identify the metric unit or the workbook query.
 
-**What this can establish after review:** Visibility into the network-flow records displayed in the captured query or dashboard, including any shown classifications and traffic dispositions.
+**What this validates:** A historical Sentinel Workbook was configured and rendered a populated geographic visualization with location summaries.
 
-**What it does not establish:** Packet-level capture, verified attacker intent, comprehensive network coverage, automatic blocking, or that an alert/incident was generated.
+**Historical context:** Earlier implementation notes report investigations using `AzureNetworkAnalytics\_CL` and malicious allowed/denied flow classifications. Those notes are contextual claims, **not** independently demonstrated by this screenshot.
 
-**Review state:** Pending artifact review.  
-**V2 revalidation:** Choose a currently supported flow-log collection approach; enable required network telemetry; verify ingestion, schema, timestamps, and flow disposition; reproduce the investigation; retain the KQL and dated results.
+**Limitations:** The underlying KQL, data source, flow direction, allow/deny disposition, threat classification, time range, and alert/incident generation are not visible. The title alone does not prove the plotted traffic was malicious or allowed inbound.
 
-## Additional V1 evidence to collect
+**Review state:** Reviewed — workbook visualization validated; network-flow classification not independently verified.  
+**V2 revalidation:** Preserve the workbook definition and KQL, select a supported network telemetry source, verify source schema and flow dispositions, run controlled traffic tests, and capture the resulting query output and visualization with UTC timestamps.
+
+## BTH-V1-EV-003 — Windows RDP authentication-oriented workbook
+
+**Capability:** Windows authentication monitoring visualization  
+**Evidence:** [`evidence/v1/dashboards/windows-security-monitoring.png`](../../evidence/v1/dashboards/windows-security-monitoring.png)  
+**Source:** Microsoft Sentinel > Workbooks; workbook title `windows-rdp-auth-fail`, workspace `law-cyber-lab-0x`.
+
+**Observed result:** A populated global map with location summary values, including Düsseldorf (Germany) 240, Lac-du-Cerf (Canada) 225, another Düsseldorf entry 225, France 159, and Chantilly (France) 89. Repeated labels are transcribed as shown, without assuming they represent distinct entities. The metric unit and time range are not visible.
+
+**What this validates:** A historical Sentinel Workbook intended for Windows/RDP authentication monitoring rendered a populated geographic visualization.
+
+**Limitations:** No underlying KQL, `SecurityEvent` table results, Windows Event ID 4625, RDP logon-type filtering, or alert/incident result is visible. Failed RDP logons and brute-force detection are therefore **not** independently established by this image.
+
+**Review state:** Reviewed — workbook visualization validated; Windows event ingestion and RDP filtering not independently verified.  
+**V2 revalidation:** Generate authorized failed RDP authentication attempts on a test Windows host, verify AMA/DCR ingestion and event fields, version-control the KQL, and confirm workbook aggregations match raw results.
+
+## BTH-V1-EV-004 — Linux SSH authentication-oriented workbook
+
+**Capability:** Linux authentication monitoring visualization  
+**Evidence:** [`evidence/v1/dashboards/linux-security-monitoring.png`](../../evidence/v1/dashboards/linux-security-monitoring.png)  
+**Source:** Microsoft Sentinel > Workbooks; workbook title `linux-ssh-auth-fail`, workspace `law-cyber-lab-0x`.
+
+**Observed result:** A populated world map with location summary values. Visible examples include Glendora (United States) 7.63k, Central (Hong Kong) 249, Martin (United States) 106, Manaus (Brazil) 81, and Other 75. The prominent Glendora value is a displayed aggregate, **not** proof of 7,630 failed SSH attempts; the measurement unit and aggregation query are not shown.
+
+**What this validates:** A historical Sentinel Workbook intended for Linux/SSH authentication monitoring rendered a populated geographic visualization.
+
+**Limitations:** The screenshot does not independently verify `Syslog` ingestion, `sshd` message filtering, SSH authentication failures, brute-force detection, or Sentinel incidents.
+
+**Review state:** Reviewed — workbook visualization validated; Linux SSH detection logic not independently verified.  
+**V2 revalidation:** Generate safe SSH failures on an authorized Linux test VM, validate Syslog collection through AMA/DCR, capture raw events and the workbook query, and reconcile displayed counts with query output.
+
+## Historical evidence gaps and V2 collection targets
 
 |Area|Candidate artifact|Intended validation|
 |-|-|-|
@@ -78,7 +114,7 @@ My original V1 Azure environment is no longer active. Entries marked **Historica
 |Security posture|Defender for Cloud findings|Observed posture assessment at capture time|
 |Identity|RBAC assignments and access tests, appropriately redacted|Scope and effectiveness of access controls|
 
-These are **collection targets**, not additional verified evidence entries.
+These are **V2 collection targets**, not additional preserved V1 screenshots or verified evidence entries. The historical screenshot review is complete; do not imply these artifacts still exist or must be recovered.
 
 ## How this connects to the capability matrix
 
@@ -100,13 +136,15 @@ For each capability in [`CAPABILITY-MATRIX.md`](CAPABILITY-MATRIX.md):
 7. Update the capability matrix with the evidence ID.
 8. Commit the register and evidence together using a descriptive commit message.
 
-## Next review actions
+## Review completion and next actions
 
-* \[ ] Open `geoip-watchlist-query.png` and record the visible query, timestamp (if shown), and returned fields.
-* \[ ] Open `malicious-inbound-flows.png` and record the visible query/filter, time range (if shown), and disposition fields.
-* \[ ] Update both entries from `Pending artifact review` to `Reviewed` only after inspection.
-* \[ ] Cross-reference both evidence IDs in `CAPABILITY-MATRIX.md`.
-* \[ ] Collect the next batch of telemetry and incident-response evidence.
+* \[x] Review GeoIP query screenshot and transcribe visible results and limitations.
+* \[x] Review network-oriented workbook screenshot without assuming unseen KQL or dispositions.
+* \[x] Review Windows RDP-oriented workbook screenshot.
+* \[x] Review Linux SSH-oriented workbook screenshot.
+* \[x] Assign stable evidence IDs and cross-reference the capability matrix.
+* \[ ] Verify all four evidence links resolve in the published GitHub repository.
+* \[ ] Capture fresh source-query, event-ingestion, detection, and incident evidence during V2 reconstruction.
 
 \---
 

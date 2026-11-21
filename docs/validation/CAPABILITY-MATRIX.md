@@ -4,7 +4,7 @@
 > \*\*Document:\*\* `docs/validation/CAPABILITY-MATRIX.md`  
 > \*\*Scope:\*\* Version 1 historical validation and Version 2 reconstruction  
 > \*\*Status:\*\* Historical capability assessment; current deployment requires revalidation  
-> \*\*Last reviewed:\*\* 2026-11-16
+> \*\*Last reviewed:\*\* 2026-11-21
 
 ## Purpose
 
@@ -21,7 +21,7 @@ A checked capability does **not** mean I am claiming a production-ready managed 
 |**Planned / gap**|I have not established sufficient implementation or validation evidence.|
 |**Revalidation required**|The V1 environment is unavailable; V2 must demonstrate the capability again.|
 
-**Evidence standard:** An evidence reference is only a pointer to a type of artifact or a previously discussed screenshot. It is not proof that a file is currently committed to the repository. Each V2 test should record the test date, deployment/commit identifier, configuration, query or command, expected outcome, observed outcome, and sanitized supporting artifact.
+**Evidence standard:** Four historical screenshots have been directly reviewed and assigned IDs `BTH-V1-EV-001` through `BTH-V1-EV-004` in [`EVIDENCE-REGISTER.md`](EVIDENCE-REGISTER.md). Screenshot-verified visualization or watchlist access must not be confused with independent verification of underlying log pipelines, detection logic, or incident response. Confirm GitHub artifact links after committing. Each V2 test should record the test date, deployment/commit identifier, configuration, query or command, expected outcome, observed outcome, and sanitized supporting artifact.
 
 ## Executive capability matrix
 
@@ -31,12 +31,12 @@ A checked capability does **not** mean I am claiming a production-ready managed 
 |02|Alerting and monitoring|**Historically validated**|Sentinel analytics and incidents; Azure monitoring|Trigger a known event and verify alert/incident creation|
 |03|Threat detection|**Historically validated**|KQL investigation, Sentinel rules, network-flow analysis|Version-controlled detections with reproducible test cases|
 |04|Automated response / SOAR-lite|**Implemented / partial**|Sentinel playbooks created and manually exercised; automated end-to-end triggering not fully evidenced|Demonstrate approved incident-to-playbook execution and audit trail|
-|05|Dashboards and reporting|**Historically validated**|Azure Workbooks / executive views|Deploy workbook definitions and validate live data visualizations|
+|05|Dashboards and reporting|**Historically validated**|Azure Workbooks / executive views; EV-002, EV-003, EV-004 directly verify populated geographic workbook views|Deploy workbook definitions and validate live data visualizations|
 |06|Infrastructure as code|**Implemented / partial**|Initial Bicep/DCR work; V1 mainly portal-built|Rebuild core stack from reviewed Bicep/Terraform with reproducible results|
 |07|Zero Trust / IAM hardening|**Implemented / partial**|Azure identity/access and security-baseline work|Verify least privilege, managed identities, access boundaries, and audit logs|
 |08|Disaster recovery / backups|**Implemented / partial**|V1 checklist marked complete; recoverability proof not retained in current record|Execute and document a recovery test, RPO/RTO assumptions, and restoration evidence|
 |09|Endpoint detection and response|**Implemented / partial**|Defender-related baseline and endpoint monitoring work; EDR incident lifecycle not fully evidenced|Verify endpoint onboarding, alert generation, triage, and containment permissions|
-|10|Threat hunting fundamentals|**Historically validated**|KQL hunts across security, activity, system, and network telemetry|Run documented hypotheses and retain query/output evidence|
+|10|Threat hunting fundamentals|**Historically validated**|KQL hunts across security, activity, system, and network telemetry; EV-001 directly verifies a GeoIP watchlist lookup|Run documented hypotheses and retain query/output evidence|
 |11|Forensics readiness|**Planned / gap**|No complete collection, retention, integrity, and chain-of-custody workflow established|Demonstrate evidence preservation and documented handling procedure|
 |12|Vulnerability scanning|**Planned / gap**|No validated scanning-to-remediation lifecycle established|Scan test assets, triage findings, and verify remediation|
 |13|Compliance mapping|**Planned / gap**|Frameworks studied; control-to-evidence mapping not complete|Map controls to owners, implementations, tests, and artifacts|
@@ -80,7 +80,7 @@ A checked capability does **not** mean I am claiming a production-ready managed 
 
 ### 05 — Dashboards and reporting
 
-**What I validated:** Azure Workbooks and executive-facing visualizations built on collected telemetry.
+**What I validated:** Azure Workbooks and executive-facing visualizations. Screenshots EV-002, EV-003, and EV-004 directly show three populated geographic workbook views for network, Windows/RDP, and Linux/SSH monitoring themes. Their underlying KQL, source tables, and metric definitions are not visible, so those details remain historical implementation claims requiring V2 verification.
 
 **V2 test:** Store workbook definitions in source control; deploy to the intended workspace; verify time ranges, filters, queries, data freshness, and role-based access. Document what each metric actually measures.
 
@@ -112,7 +112,7 @@ A checked capability does **not** mean I am claiming a production-ready managed 
 
 ### 10 — Threat hunting
 
-**What I validated:** Hands-on KQL exploration of host, Azure activity, and network signals; GeoIP watchlist lookups; and hypotheses around suspicious traffic and DNS-related anomalies.
+**What I validated:** Hands-on KQL exploration of host, Azure activity, and network signals; GeoIP watchlist lookups; and hypotheses around suspicious traffic and DNS-related anomalies. EV-001 directly verifies successful `\_GetWatchlist("geoip")` retrieval; the broader hunts are supported by historical implementation records rather than the four screenshots.
 
 **V2 test:** Create a repeatable hunt notebook/template: hypothesis → required data → KQL → findings → disposition → detection engineering opportunity. Preserve negative findings as well as confirmed results.
 
@@ -142,16 +142,24 @@ A checked capability does **not** mean I am claiming a production-ready managed 
 
 ## Evidence index and traceability
 
-|Evidence / location|Supports|Verification note|
+The following four screenshots have been visually reviewed. **Reviewed** means the displayed artifact was inspected; it is not a claim that the original environment is still running or that every underlying pipeline has been independently proven.
+
+|Evidence ID|Artifact|Directly supported capability|Important limitation|
+|-|-|-|-|
+|[BTH-V1-EV-001](EVIDENCE-REGISTER.md#bth-v1-ev-001--geoip-watchlist-query)|[GeoIP watchlist query](../../evidence/v1/threat-hunting/geoip-watchlist-query.png)|Queryable watchlist with returned records; supports capability 10 and the watchlist aspect of 03|No evidence of analytics-rule use or automated incident generation|
+|[BTH-V1-EV-002](EVIDENCE-REGISTER.md#bth-v1-ev-002--network-oriented-geographic-workbook)|[Network workbook](../../evidence/v1/network/malicious-inbound-flows.png)|Geographic Sentinel Workbook; supports capability 05|No visible KQL, NSG disposition, or proof of malicious traffic|
+|[BTH-V1-EV-003](EVIDENCE-REGISTER.md#bth-v1-ev-003--windows-rdp-authentication-oriented-workbook)|[Windows RDP workbook](../../evidence/v1/dashboards/windows-security-monitoring.png)|Geographic Sentinel Workbook; supports capability 05|No visible Event ID 4625 or RDP-specific filtering|
+|[BTH-V1-EV-004](EVIDENCE-REGISTER.md#bth-v1-ev-004--linux-ssh-authentication-oriented-workbook)|[Linux SSH workbook](../../evidence/v1/dashboards/linux-security-monitoring.png)|Geographic Sentinel Workbook; supports capability 05|No visible Syslog query or SSH-failure filtering|
+
+**Historical claims without direct screenshot proof:** AMA/DCR associations, fresh Windows/Linux event ingestion, Sentinel rule triggering, incidents, playbook execution, IAM enforcement, backups, EDR workflows, and the exact NSG flow-log query remain documented from the V1 implementation history. The existing executive capability assessments are preserved, but these are **not** upgraded to screenshot-verified status.
+
+|Other location|Purpose|Verification note|
 |-|-|-|
-|Historical screenshot **84** (GeoIP watchlist query)|Watchlist lookup / hunting|Confirm image and metadata are committed under `evidence/v1/` before linking|
-|Historical screenshot **119** (malicious inbound flow analysis)|Network visibility / detection|Confirm image and underlying query/context before linking|
-|`evidence/v1/`|Historical V1 artifacts|Populate with sanitized screenshots and explanatory captions|
-|`detections/windows/`, `detections/linux/`, `detections/network/`, `detections/identity/`, `detections/azure-resources/`|Version-controlled detection content|Folders do not prove detection coverage until rules and tests are committed|
-|`docs/architecture/ARCHITECTURE.md`|Design and component relationships|Architectural rationale, not runtime proof|
-|`docs/architecture/RESOURCE-INVENTORY.md`|Resource inventory|Reconcile historical names with V2 deployment output|
-|`docs/implementation/V1-MANUAL-IMPLEMENTATION.md`|Historical build steps|Reconstruct and validate rather than assuming current deployment|
-|`docs/incident-response/INCIDENT-RESPONSE.md`|Response process|Procedures require exercise records to demonstrate readiness|
+|`detections/windows/`, `detections/linux/`, `detections/network/`, `detections/identity/`, `detections/azure-resources/`|Future version-controlled detection content|Folder placeholders do not establish detection coverage|
+|[`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md)|Design and component relationships|Rationale, not runtime proof|
+|[`RESOURCE-INVENTORY.md`](../architecture/RESOURCE-INVENTORY.md)|Resource inventory|Reconcile with V2 deployment output|
+|[`V1-MANUAL-IMPLEMENTATION.md`](../implementation/V1-MANUAL-IMPLEMENTATION.md)|Historical build steps|Reconstruct and revalidate|
+|[`INCIDENT-RESPONSE.md`](../incident-response/INCIDENT-RESPONSE.md)|Response process|Procedures require exercises to demonstrate readiness|
 
 **Evidence handling:** Redact tenant IDs where unnecessary, subscription identifiers, IP addresses tied to real environments, usernames, tokens, secrets, and sensitive incident details. Preserve the original context privately when needed, and never commit credentials or unrestricted evidence dumps.
 
