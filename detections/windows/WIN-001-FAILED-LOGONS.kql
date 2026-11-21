@@ -1,0 +1,14 @@
+// WIN-001 — repeated failed Windows logons by host, account and source IP
+// V2 candidate; requires SecurityEvent table with EventID 4625.
+let lookback = 1h;
+let windowSize = 10m;
+let threshold = 5;
+SecurityEvent
+| where TimeGenerated >= ago(lookback)
+| where EventID == 4625
+| extend AccountName = tostring(Account), SourceIP = tostring(IpAddress), Host = tostring(Computer)
+| where isnotempty(AccountName) and isnotempty(Host)
+| summarize FailureCount=count(), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated), LogonTypes=make_set(LogonType, 10) by Host, AccountName, SourceIP, bin(TimeGenerated, windowSize)
+| where FailureCount >= threshold
+| project TimeGenerated, Host, AccountName, SourceIP, FailureCount, FirstSeen, LastSeen, LogonTypes
+| order by FailureCount desc
