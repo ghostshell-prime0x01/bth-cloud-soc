@@ -1,0 +1,6 @@
+PASS test_boundary_spanning_detection
+PASS test_below_threshold
+PASS test_separate_accounts
+PASS test_separate_hosts
+PASS test_separate_source_ips
+PASS test_successful_logons_ignored

@@ -1,0 +1,5 @@
+PASS test_multiple_windows_one_result
+PASS test_latest_window_selected
+PASS test_distinct_entities_preserved
+PASS test_below_threshold_no_result
+PASS test_separate_bursts_collapsed

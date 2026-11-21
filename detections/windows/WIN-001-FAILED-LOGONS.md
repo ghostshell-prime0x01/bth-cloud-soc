@@ -92,3 +92,51 @@ A local Python simulation can validate grouping and threshold expectations, **bu
 - [ ] Detection evidence committed
 
 **Engineering standard:** A committed query is a candidate detection, not proof of live protection.
+
+
+## Version 1.1 — Overlapping-Window Candidate
+
+**Problem:** Fixed 10-minute bins can miss repeated
+authentication failures spanning a bin boundary.
+
+**Decision:** Evaluate overlapping 10-minute windows
+at one-minute intervals.
+
+**Expected benefit:** Improved detection of
+boundary-spanning authentication bursts.
+
+**Tradeoffs:**
+- Additional query processing
+- Possible duplicate results across windows
+- More complex alert suppression and tuning
+
+**Validation status:** Not yet executed in Azure.
+
+**Next tests:**
+1. Verify KQL syntax and field compatibility.
+2. Confirm threshold behavior with synthetic events.
+3. Test boundary-spanning failures.
+4. Measure duplicate results and query performance.
+5. Validate Sentinel scheduling and incident grouping.
+
+**Rollback:** Retain the original fixed-window query
+until the replacement passes validation.
+
+
+### v1.1 Duplicate Detection Control
+
+The overlapping-window candidate uses `arg_max(WindowEnd, *)`
+to select the latest qualifying window per host, account,
+and source IP within a single query execution.
+
+This reduces duplicate query results but does not guarantee
+deduplication across scheduled Sentinel executions.
+
+Known tradeoffs:
+- Distinct bursts involving the same host/account/IP may be
+  collapsed within the query lookback period.
+- Scheduled execution overlap may still generate repeat alerts.
+- Empty source IP handling remains under review.
+- Live KQL behavior and performance remain unvalidated.
+
+Status: Offline design candidate; not production validated.

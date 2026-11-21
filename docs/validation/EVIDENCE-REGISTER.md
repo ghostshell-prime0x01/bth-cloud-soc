@@ -150,3 +150,40 @@ For each capability in [`CAPABILITY-MATRIX.md`](CAPABILITY-MATRIX.md):
 
 **Engineering principle:** Evidence should support the claim—not the other way around. V1 screenshots establish historical observations; V2 needs fresh, reproducible validation.
 
+
+## WIN-001 v1.1 — Offline Regression Evidence
+
+**Detection:** WIN-001 — Repeated Windows Failed Logons
+
+**Version:** 1.1 (candidate)
+
+**Validation environment:** Local Debian / Python 3
+
+**Evidence artifact:**
+`evidence/v2/detections/windows/WIN-001-full-regression.txt`
+
+**Validation results:**
+- Baseline detection tests: 3 PASS
+- Extended baseline tests: 5 PASS
+- Sliding-window model tests: 6 PASS
+- Deduplication model tests: 5 PASS
+- Total: 19 PASS
+- Python exit status: 0
+
+**Validated behavior:**
+- Detection threshold enforcement in local models
+- Separation by host, account, and source IP
+- Boundary-spanning authentication failures
+- Exclusion of successful authentication events
+- Latest qualifying window selection per entity
+
+**Known limitations:**
+- Python tests do not execute KQL.
+- Final KQL syntax and behavior remain unverified in Azure.
+- Deduplication may collapse separate bursts from the same entity.
+- Duplicate alerts across Sentinel executions remain possible.
+- Empty source IP handling requires a documented policy.
+- Query performance has not been measured.
+
+**Validation status:** Offline Python model tests passed.
+Azure KQL execution and Sentinel deployment pending.

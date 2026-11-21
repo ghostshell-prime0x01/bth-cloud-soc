@@ -1,0 +1,57 @@
+
+/*
+WIN-001 v1.1 — Repeated Windows Failed Logons
+Status: Offline design candidate / not deployed
+Source: SecurityEvent
+MITRE ATT&CK: T1110 — Brute Force
+
+Overlapping 10-minute windows evaluated every minute.
+Deduplication selects the latest qualifying window
+per host, account, and source IP per query execution.
+*/
+
+let lookback = 1h;
+let windowSize = 10m;
+let stepSize = 1m;
+let threshold = 5;
+let evaluationEnd = bin(now(), stepSize);
+let evaluationStart = evaluationEnd - lookback;
+
+SecurityEvent
+| where TimeGenerated > evaluationStart - windowSize
+    and TimeGenerated <= evaluationEnd
+| where EventID == 4625
+| extend
+    Host = tostring(Computer),
+    AccountName = tostring(Account),
+    SourceIP = tostring(IpAddress)
+| where isnotempty(Host)
+    and isnotempty(AccountName)
+| extend WindowOffset = range(0, 10, 1)
+| mv-expand WindowOffset to typeof(long)
+| extend WindowEnd =
+    bin(TimeGenerated, stepSize)
+    + WindowOffset * stepSize
+| where WindowEnd >= evaluationStart
+    and WindowEnd <= evaluationEnd
+| where TimeGenerated > WindowEnd - windowSize
+    and TimeGenerated <= WindowEnd
+| summarize
+    FailureCount = count(),
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated),
+    LogonTypes = make_set(LogonType, 10)
+    by WindowEnd, Host, AccountName, SourceIP
+| where FailureCount >= threshold
+| summarize arg_max(WindowEnd, *)
+    by Host, AccountName, SourceIP
+| project
+    TimeGenerated = WindowEnd,
+    Host,
+    AccountName,
+    SourceIP,
+    FailureCount,
+    FirstSeen,
+    LastSeen,
+    LogonTypes
+| order by TimeGenerated desc, FailureCount desc
