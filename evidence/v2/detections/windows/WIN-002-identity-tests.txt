@@ -1,0 +1,4 @@
+PASS test_duplicate_timestamp_successes
+
+1 test passed.
+Exit status: 0

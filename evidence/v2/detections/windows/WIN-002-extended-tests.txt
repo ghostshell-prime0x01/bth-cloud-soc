@@ -1,0 +1,9 @@
+PASS test_mixed_source_ips
+PASS test_multiple_successes
+PASS test_separate_failure_bursts
+PASS test_unrelated_event_ids
+PASS test_unsorted_mixed_events
+PASS test_window_boundary_precision
+
+6 tests passed.
+Exit status: 0

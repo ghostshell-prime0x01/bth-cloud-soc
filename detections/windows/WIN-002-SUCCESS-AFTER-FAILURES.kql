@@ -1,0 +1,83 @@
+
+/*
+WIN-002 — Successful Logon After Repeated Failures
+Status: Offline candidate / not deployed
+Source: SecurityEvent
+MITRE ATT&CK: T1110 — Brute Force
+
+Detects a successful Windows logon preceded by
+at least five failed logons involving the same
+host, account, and source IP within ten minutes.
+
+KQL execution and schema validation pending Azure.
+*/
+
+let threshold = 5;
+let failureWindow = 10m;
+let successLookback = 1h;
+
+let Successes = materialize(
+    SecurityEvent
+    | where TimeGenerated > ago(successLookback)
+    | where EventID == 4624
+    | extend
+        Host = tostring(Computer),
+        AccountName = tostring(Account),
+        SourceIP = tostring(IpAddress)
+    | where isnotempty(Host)
+        and isnotempty(AccountName)
+        and isnotempty(SourceIP)
+| serialize
+| extend SuccessRowId = row_number()
+| project
+    SuccessRowId,
+    SuccessTime = TimeGenerated,
+    Host,
+    AccountName,
+    SourceIP,
+    SuccessLogonType = LogonType);
+
+let Failures = materialize(
+    SecurityEvent
+    | where TimeGenerated > ago(successLookback + failureWindow)
+    | where EventID == 4625
+    | extend
+        Host = tostring(Computer),
+        AccountName = tostring(Account),
+        SourceIP = tostring(IpAddress)
+    | where isnotempty(Host)
+        and isnotempty(AccountName)
+        and isnotempty(SourceIP)
+    | project
+        FailureTime = TimeGenerated,
+        Host,
+        AccountName,
+        SourceIP
+);
+
+Successes
+| join kind=inner Failures
+    on Host, AccountName, SourceIP
+| where FailureTime > SuccessTime - failureWindow
+    and FailureTime < SuccessTime
+| summarize
+    FailureCount = count(),
+    FirstFailure = min(FailureTime),
+    LastFailure = max(FailureTime)
+    by SuccessRowId,
+       SuccessTime,
+       Host,
+       AccountName,
+       SourceIP,
+       SuccessLogonType
+| where FailureCount >= threshold
+| project
+    TimeGenerated = SuccessTime,
+    Host,
+    AccountName,
+    SourceIP,
+    FailureCount,
+    FirstFailure,
+    LastFailure,
+    SuccessLogonType
+| order by TimeGenerated desc

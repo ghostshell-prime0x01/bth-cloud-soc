@@ -1,0 +1,13 @@
+PASS test_below_threshold
+PASS test_different_account
+PASS test_different_host
+PASS test_different_source_ip
+PASS test_exact_window_boundary
+PASS test_failures_after_success
+PASS test_failures_outside_window
+PASS test_five_failures_then_success
+PASS test_missing_source_ip
+PASS test_unsorted_input
+
+10 tests passed.
+Exit status: 0

@@ -187,3 +187,43 @@ For each capability in [`CAPABILITY-MATRIX.md`](CAPABILITY-MATRIX.md):
 
 **Validation status:** Offline Python model tests passed.
 Azure KQL execution and Sentinel deployment pending.
+
+
+## WIN-002 — Successful Logon After Repeated Failures
+
+**Status:** Offline Python validation passed;
+KQL candidate not executed.
+
+**Evidence directory:**
+`evidence/v2/detections/windows/`
+
+### Evidence Artifacts
+
+- `WIN-002-offline-tests.txt`
+- `WIN-002-extended-tests.txt`
+- `WIN-002-identity-tests.txt`
+
+### Validation Summary
+
+- Initial tests: 10 PASS
+- Extended tests: 6 PASS
+- Event identity test: 1 PASS
+- Total: 17 PASS
+- Exit status: 0 for each suite
+
+### Validation Scope
+
+The evidence demonstrates the behavior of the Python
+reference model against synthetic authentication events.
+
+It does not demonstrate successful KQL execution,
+production telemetry ingestion, or Sentinel alert generation.
+
+### Deferred Validation
+
+- Verify SecurityEvent schema and field mappings.
+- Execute and troubleshoot the KQL candidate.
+- Validate correlation against controlled Windows events.
+- Assess duplicate alerts and ingestion latency.
+- Configure Sentinel analytics rule.
+- Capture live detection and incident evidence.
