@@ -1,0 +1,13 @@
+PASS test_group_sid_mapping
+PASS test_member_sid_mapping
+PASS test_actor_account_mapping
+PASS test_actor_sid_mapping
+PASS test_group_name_mapping
+PASS test_event_record_mapping
+PASS test_source_channel_mapping
+PASS test_domain_allowlist_defaults_empty
+PASS test_supported_event_ids
+PASS test_no_active_deduplication
+
+10/10 tests passed.
+Exit status: 0

@@ -1,0 +1,43 @@
+PASS test_local_administrators_addition
+PASS test_domain_admins_configured_sid
+PASS test_domain_admins_without_configuration
+PASS test_nonprivileged_group
+PASS test_unsupported_event_id
+PASS test_missing_member_sid
+PASS test_missing_group_sid
+PASS test_missing_timestamp
+PASS test_renamed_privileged_group
+PASS test_actor_member_distinction
+
+10 tests passed.
+PASS test_sid_case_normalization
+PASS test_sid_whitespace_normalization
+PASS test_malformed_sid_rejected
+PASS test_multiple_privileged_changes
+PASS test_missing_actor_identity
+PASS test_inconsistent_builtin_group_scope
+PASS test_domain_admins_global_scope
+PASS test_enterprise_admins_universal_scope
+
+8/8 tests passed.
+PASS test_domain_admins_correct_global_scope
+PASS test_domain_admins_incorrect_universal_scope
+PASS test_enterprise_admins_correct_universal_scope
+PASS test_enterprise_admins_incorrect_global_scope
+
+4/4 tests passed.
+PASS test_duplicate_event_identity
+PASS test_distinct_records_same_timestamp
+PASS test_same_record_id_different_hosts
+PASS test_same_record_id_different_channels
+PASS test_missing_record_identity_preserves_events
+
+5/5 tests passed.
+PASS test_non_dictionary_event_rejected
+PASS test_unhashable_event_id_rejected
+PASS test_non_string_group_sid_rejected
+PASS test_invalid_record_identity_preserves_events
+PASS test_boolean_event_id_rejected
+
+5/5 tests passed.
+Exit status: 0

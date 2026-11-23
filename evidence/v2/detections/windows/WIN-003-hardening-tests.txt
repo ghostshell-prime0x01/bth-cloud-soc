@@ -1,0 +1,8 @@
+PASS test_non_dictionary_event_rejected
+PASS test_unhashable_event_id_rejected
+PASS test_non_string_group_sid_rejected
+PASS test_invalid_record_identity_preserves_events
+PASS test_boolean_event_id_rejected
+
+5/5 tests passed.
+Exit status: 0

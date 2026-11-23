@@ -1,0 +1,8 @@
+PASS test_duplicate_event_identity
+PASS test_distinct_records_same_timestamp
+PASS test_same_record_id_different_hosts
+PASS test_same_record_id_different_channels
+PASS test_missing_record_identity_preserves_events
+
+5/5 tests passed.
+Exit status: 0

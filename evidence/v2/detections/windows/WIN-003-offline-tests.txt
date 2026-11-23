@@ -1,0 +1,13 @@
+PASS test_local_administrators_addition
+PASS test_domain_admins_configured_sid
+PASS test_domain_admins_without_configuration
+PASS test_nonprivileged_group
+PASS test_unsupported_event_id
+PASS test_missing_member_sid
+PASS test_missing_group_sid
+PASS test_missing_timestamp
+PASS test_renamed_privileged_group
+PASS test_actor_member_distinction
+
+10 tests passed.
+Exit status: 0

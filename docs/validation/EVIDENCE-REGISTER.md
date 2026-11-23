@@ -227,3 +227,112 @@ production telemetry ingestion, or Sentinel alert generation.
 - Assess duplicate alerts and ingestion latency.
 - Configure Sentinel analytics rule.
 - Capture live detection and incident evidence.
+
+---
+
+## WIN-003 — Suspicious Privileged Group Membership Changes
+
+**Status:** Offline engineering candidate — Azure validation pending.
+
+**Detection source:**
+`detections/windows/WIN-003-PRIVILEGED-GROUP-CHANGES.kql`
+
+**Engineering documentation:**
+`detections/windows/WIN-003-PRIVILEGED-GROUP-CHANGES.md`
+
+**Validation environment:** Local Debian / Python 3
+
+### Evidence Artifacts
+
+All paths are relative to the repository root.
+
+| Evidence ID | Artifact | Purpose |
+|---|---|---|
+| BTH-V2-EV-003-01 | `evidence/v2/detections/windows/WIN-003-final-regression.txt` | Consolidated final regression |
+| BTH-V2-EV-003-02 | `evidence/v2/detections/windows/WIN-003-kql-contract-tests.txt` | Static KQL source-contract validation |
+| BTH-V2-EV-003-03 | `evidence/v2/detections/windows/WIN-003-identity-tests.txt` | Event identity and deduplication tests |
+| BTH-V2-EV-003-04 | `evidence/v2/detections/windows/WIN-003-hardening-tests.txt` | Malformed telemetry and input validation |
+| BTH-V2-EV-003-05 | `evidence/v2/detections/windows/WIN-003-advanced-tests.txt` | Domain privileged-group scope tests |
+
+Additional baseline and intermediate regression artifacts are
+preserved in `evidence/v2/detections/windows/`.
+
+### Final Validation Results
+
+| Test suite | Result |
+|---|---|
+| Core detection | 10/10 PASS |
+| Extended scenarios | 8/8 PASS |
+| Advanced group scope | 4/4 PASS |
+| Event identity | 5/5 PASS |
+| Input hardening | 5/5 PASS |
+| KQL source contracts | 10/10 PASS |
+| **Total** | **42/42 PASS** |
+
+**Final exit status:** 0
+
+### Validated Offline Behavior
+
+- Detection of configured privileged-group membership additions.
+- Recognition of supported Windows Event IDs 4728, 4732, and 4756.
+- Built-in privileged-group SID matching.
+- Explicit domain privileged-group SID allowlisting.
+- Event-scope validation for recognized privileged groups.
+- Separation of actor identity from added-member identity.
+- Python reference-model event identity and deduplication behavior.
+- Handling of malformed and incomplete synthetic telemetry.
+- Static verification of intended KQL source-column mappings.
+
+### Troubleshooting Evidence
+
+Regression development exposed issues involving:
+
+- Built-in privileged-group event scope.
+- Domain privileged-group event scope.
+- Duplicate event identity.
+- Malformed telemetry.
+- Static KQL contract-test implementation.
+
+The KQL contract-test harness initially reported 4/10 passing
+tests, followed by 3/10 after an unsuccessful regex revision.
+
+Replacing the fragile regex approach with direct assignment
+inspection produced 10/10 passing contract tests.
+
+The final contract-test artifact records the passing result.
+The earlier 4/10 and 3/10 outputs were observed during
+development but are not preserved in that final artifact.
+
+### Evidence Limitations
+
+These artifacts validate local Python behavior and static
+KQL source assumptions.
+
+They do not establish:
+
+- Successful KQL execution in Azure Log Analytics.
+- Correct field mappings against actual SecurityEvent telemetry.
+- Successful Windows event ingestion through AMA/DCR.
+- Production detection accuracy or false-positive rates.
+- Query performance or ingestion latency.
+- Sentinel analytics rule execution.
+- Alert deduplication or incident generation.
+
+The Python reference model performs conditional event-identity
+deduplication. The current KQL candidate intentionally does not
+deduplicate events.
+
+Domain privileged-group SIDs must be configured from a verified
+environment inventory before live validation.
+
+### Deferred Azure Validation
+
+1. Verify SecurityEvent schema and source-column mappings.
+2. Execute the KQL candidate against controlled telemetry.
+3. Configure verified privileged-group SIDs.
+4. Validate actor, member, and group entity mappings.
+5. Evaluate detection accuracy, false positives, and performance.
+6. Implement and validate the Sentinel analytics rule.
+7. Capture fresh live-validation evidence.
+
+**Production readiness:** Not established.

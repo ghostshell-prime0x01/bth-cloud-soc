@@ -1,0 +1,112 @@
+
+// WIN-003: Suspicious Privileged Group Membership Changes
+// BTH Cloud SOC | Version 2 | Offline KQL candidate
+//
+// Status: NOT VALIDATED IN MICROSOFT SENTINEL
+// Source: SecurityEvent
+//
+// Detects additions to selected privileged Windows groups.
+// Domain privileged SIDs must be explicitly configured.
+//
+// Event scope:
+// 4728 = security-enabled global group member added
+// 4732 = security-enabled local group member added
+// 4756 = security-enabled universal group member added
+//
+// IMPORTANT:
+// Replace example domain SIDs with actual authorized domain SIDs.
+// Example SIDs below are placeholders, not production configuration.
+
+let Lookback = 1d;
+
+let BuiltinPrivilegedSids = dynamic([
+    "S-1-5-32-544",
+    "S-1-5-32-548",
+    "S-1-5-32-549",
+    "S-1-5-32-550",
+    "S-1-5-32-551"
+]);
+
+// Empty by default: populate from verified environment inventory.
+let ConfiguredDomainSids = dynamic([]);
+
+SecurityEvent
+| where TimeGenerated >= ago(Lookback)
+| where EventID in (4728, 4732, 4756)
+
+// Resolve optional fields without assuming every column exists.
+// Column mappings must be verified against actual Azure telemetry.
+| extend
+    GroupSid = toupper(trim(@"\s+", tostring(column_ifexists("TargetSid", "")))),
+    AddedMemberSid = tostring(column_ifexists("MemberSid", "")),
+    ActorAccount = tostring(column_ifexists("SubjectAccount", "")),
+    ActorSid = tostring(column_ifexists("SubjectUserSid", "")),
+    GroupName = tostring(column_ifexists("TargetAccount", "")),
+    SourceRecordId = tostring(column_ifexists("EventRecordId", "")),
+    SourceChannel = tostring(column_ifexists("Channel", "Security"))
+
+| where isnotempty(GroupSid)
+| where isnotempty(AddedMemberSid)
+
+// Built-in privileged groups are identified by their well-known SIDs.
+// Domain privileged groups require explicit allowlisting.
+| extend
+    IsBuiltin = set_has_element(BuiltinPrivilegedSids, GroupSid),
+    IsConfiguredDomain = set_has_element(ConfiguredDomainSids, GroupSid)
+
+| where IsBuiltin or IsConfiguredDomain
+
+// Validate the expected event type for recognized privileged groups.
+// Other explicitly configured domain groups require separate scope metadata.
+| extend
+    GroupSidParts = split(GroupSid, "-")
+| extend
+    GroupRid = tostring(
+        GroupSidParts[array_length(GroupSidParts) - 1]
+    )
+| extend
+    ExpectedEventId = case(
+        IsBuiltin, 4732,
+        IsConfiguredDomain and GroupRid == "512", 4728,
+        IsConfiguredDomain and GroupRid in ("518", "519"), 4756,
+        int(null)
+    )
+
+| where isnull(ExpectedEventId) or EventID == ExpectedEventId
+
+// Construct an initial event identity.
+// This is not guaranteed unique across log resets or rollover.
+| extend
+    EventIdentity = iff(
+        isnotempty(Computer)
+        and isnotempty(SourceChannel)
+        and isnotempty(SourceRecordId),
+        strcat(
+            tolower(Computer), "|",
+            tolower(SourceChannel), "|",
+            SourceRecordId
+        ),
+        ""
+    )
+
+// Preserve records without a complete identity.
+// Deduplicate records with a complete source identity.
+// Initial offline candidate:
+// Preserve every qualifying row until source event identity
+// and deduplication semantics are validated in Azure.
+//
+// EventIdentity is projected for investigation and future
+// deduplication. No rows are removed here.
+| project
+    TimeGenerated,
+    Computer,
+    EventID,
+    ActorAccount,
+    ActorSid,
+    AddedMemberSid,
+    GroupName,
+    GroupSid,
+    SourceRecordId,
+    SourceChannel,
+    EventIdentity
+| order by TimeGenerated desc

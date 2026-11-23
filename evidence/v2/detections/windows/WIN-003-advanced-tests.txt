@@ -1,0 +1,7 @@
+PASS test_domain_admins_correct_global_scope
+PASS test_domain_admins_incorrect_universal_scope
+PASS test_enterprise_admins_correct_universal_scope
+PASS test_enterprise_admins_incorrect_global_scope
+
+4/4 tests passed.
+Exit status: 0

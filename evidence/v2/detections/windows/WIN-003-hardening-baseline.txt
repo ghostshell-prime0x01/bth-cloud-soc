@@ -1,0 +1,8 @@
+ERROR test_non_dictionary_event_rejected: AttributeError: 'NoneType' object has no attribute 'get'
+ERROR test_unhashable_event_id_rejected: TypeError: unhashable type: 'list'
+PASS test_non_string_group_sid_rejected
+PASS test_invalid_record_identity_preserves_events
+PASS test_boolean_event_id_rejected
+
+3/5 tests passed.
+Exit status: 1

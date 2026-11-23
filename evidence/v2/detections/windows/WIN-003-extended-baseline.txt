@@ -1,0 +1,11 @@
+PASS test_sid_case_normalization
+PASS test_sid_whitespace_normalization
+PASS test_malformed_sid_rejected
+PASS test_multiple_privileged_changes
+PASS test_missing_actor_identity
+FAIL test_inconsistent_builtin_group_scope
+PASS test_domain_admins_global_scope
+PASS test_enterprise_admins_universal_scope
+
+7/8 tests passed.
+Exit status: 1
